@@ -8,7 +8,7 @@ import sys
 import os.path
 
 
-# function to yes/no questions
+# function for yes/no questions
 def query_yes_no(question, default="no"):
     global prompt
     valid = {"yes": True, "y": True,
@@ -54,15 +54,65 @@ class Cell:
         self.gamma = []
 
 
-# getting name of input file and checking if all files are in directory
-file_name = input('Enter name of input file (without extension): ')
+freqs = []
+create_movie = False
+
+if len(sys.argv) < 2:
+    print("You are in manual mode. To load input data from file restart this program and specify the input file as \"python phonons.py input_file.txt\"")
+
+    # getting name of a vasp files
+    file_name = input("To exit program press enter or specify the name (without extension) of the vasp files: ")
+    if file_name == "":
+        sys.exit(0)
+
+    # frequency input
+    while True:
+        try:
+            freq_min, freq_max = (float(s) for s in input('Enter the frequency range you want to analyze '
+                                                          '(with space as separator, e.g., 22 27): ').split())
+        except ValueError:
+            print('Incorrect data format. Try again: ')
+        else:
+            break
+    
+    # amplitude input
+    while True:
+        try:
+            amp_min, amp_max, amp_step = (float(s) for s in input('Enter the amplitude range you want to analyze'
+                                                                        ' with number of steps'
+                                                                        ' (with space as separator,'
+                                                                        ' e.g., -2 2 0.5): ').split())
+        except ValueError:
+            print('Incorrect data format. Try again: ')
+        else:
+            break
+        amp_range = input("")
+
+    # movies
+    create_movie = query_yes_no('Do you want to create a .pdb file with phonon visualisation?')
+
+else:
+    with open(sys.argv[1], 'r') as input_file:
+        for i, line in enumerate(input_file):
+            if i == 1:
+                file_name = str(line).rstrip()
+            elif i == 3:
+                amp_min = float(line.split()[0])
+                amp_max = float(line.split()[1])
+                amp_step = float(line.split()[2])
+            elif i == 5:
+                if str(line).rstrip() == 'True':
+                    create_movie = True
+            elif i > 6:
+                freqs.append(str(line).rstrip())
+
+# checking if all files are in directory
 poscar_file = file_name + '.poscar'
 outcar_file = file_name + '.outcar'
 if os.path.isfile(poscar_file) is False:
     sys.exit("Missing file " + poscar_file + ". Check it and try again.")
 if os.path.isfile(outcar_file) is False:
     sys.exit("Missing file " + outcar_file + ". Check it and try again.")
-
 
 cell_array = np.zeros((3, 3))
 
@@ -108,29 +158,6 @@ for i in range(len(list_of_elements)-1):
     temporary_array = np.full((3, number_of_atoms[i+1]), math.sqrt(element(list_of_elements[i+1]).mass))
     masses_sqrt_array = np.concatenate((masses_sqrt_array, temporary_array), axis=1)
 
-# frequency input
-while True:
-    try:
-        freq_min, freq_max = (float(s) for s in input('Enter the frequency range you want to analyze '
-                                                      '(with space as separator, i.e. 22 27): ').split())
-    except ValueError:
-        print('Incorrect data format. Try again: ')
-    else:
-        break
-
-# amplitude input
-while True:
-    try:
-        amp_min, amp_max, amp_steps_numb = (float(s) for s in input('Enter the amplitude range you want to analyze'
-                                                                    ' with number of steps'
-                                                                    ' (with space as separator,'
-                                                                    ' i.e. -5 7 10): ').split())
-    except ValueError:
-        print('Incorrect data format. Try again: ')
-    else:
-        break
-
-create_movie = query_yes_no('Do you want to create a .pdb file with phonon visualisation?')
 if create_movie is True:
     # lattice parameters
     Cell.a = np.linalg.norm(cell_array[0, :])
@@ -186,15 +213,20 @@ outcar_positions = outcar_positions[3:6, :, :]
 modes = []
 for line in lines_with_freq:
     ind = (line.split()).index('cm-1')
-    if freq_min <= float(line.split()[ind - 1]) <= freq_max:
-        modes.append(line)
+    if not freqs:
+        if freq_min <= float(line.split()[ind - 1]) <= freq_max:
+            modes.append(line)
+    else:
+        if str("%.2f" % float(line.split()[ind - 1])) in freqs:
+            modes.append(line)
 
 # array of amplitude
-amp_range = (i for i in np.linspace(amp_min, amp_max, amp_steps_numb) if i != 0)
+amp_range = list('{:.2f}'.format(i) for i in np.arange(amp_min, amp_max + amp_step, amp_step))
+amp_range = list(float(i) for i in amp_range)
 
 deformed_array = np.copy(atom_positions)
 
-# main calulations
+# main calculations
 for mode in modes:
     shifts_array = np.copy(outcar_positions[:, :, int(mode.split()[0])-1])
     divided_array = np.copy(shifts_array)
@@ -205,7 +237,13 @@ for mode in modes:
         normalised_with_amp = divided_array * amp
         normalised_with_amp = normalised_with_amp.T
         np.add(atom_positions, normalised_with_amp, out=deformed_array)
-        name_of_file = file_name + '_' + str(mode.split()[ind-1]) + '_' + str(amp) + ".vasp"
+
+        # fast solution not to overwrite a file
+        name_of_file = file_name + '_' + str(mode.split()[ind-1]) + '_0_' + str(amp) + '.vasp'
+        if os.path.isfile(name_of_file) is True:
+            name_of_file = file_name + '_' + str(mode.split()[ind-1]) + '_1_' + str(amp) + '.vasp'
+            if os.path.isfile(name_of_file) is True:
+                name_of_file = file_name + '_' + str(mode.split()[ind-1]) + '_2_' + str(amp) + '.vasp'
         header = ''.join(map(str, head))
         header = header.rstrip('\n')
         np.savetxt(name_of_file, deformed_array, delimiter=' ', fmt='%.15f', header=header, comments='')
