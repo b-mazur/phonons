@@ -28,7 +28,7 @@ An example file is available in this repository. Comment lines with \# signs mus
 5. comment line
 6. creation of a PDB file with vibration movement, True or False (False is default which means that PDB file is not created)
 7. comment line
-8. list of desired frequencies separated with space and rounded up to two decimals 
+8. list of desired frequencies (in cm-1) separated with space and rounded up to two decimals 
 ```
 
 #### manual mode
