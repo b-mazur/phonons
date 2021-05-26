@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # you can install mendeleev package by typing 'pip3 install mendeleev' in terminal
 # more informations https://pypi.org/project/mendeleev/#modal-close
 from mendeleev import element
