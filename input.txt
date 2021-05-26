@@ -1,0 +1,8 @@
+# vasp file name (without extension, .poscar and .outcar needed in directory)
+zif-8
+# amplitude range (start stop step)
+-1.5 1.5 0.5
+# movie .pdb file creation (True/False)
+False
+# list of frequency values (rounded to two decimals)
+111.66 64.57 103.80 76.95

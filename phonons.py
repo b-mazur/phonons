@@ -58,7 +58,7 @@ freqs = []
 create_movie = False
 
 if len(sys.argv) < 2:
-    print("You are in manual mode. To load input data from file restart this program and specify the input file as \"python phonons.py input_file.txt\"")
+    print("You are in manual mode. \nTo load input data from file restart this program and specify the input file as: \n\"python phonons.py input_file.txt\"")
 
     # getting name of a vasp files
     file_name = input("To exit program press enter or specify the name (without extension) of the vasp files: ")
@@ -103,8 +103,11 @@ else:
             elif i == 5:
                 if str(line).rstrip() == 'True':
                     create_movie = True
-            elif i > 6:
-                freqs.append(str(line).rstrip())
+            elif i == 7:
+                line = line.rstrip().split()
+                for freq in line:
+                    freqs.append(str(freq))
+                break
 
 # checking if all files are in directory
 poscar_file = file_name + '.poscar'
