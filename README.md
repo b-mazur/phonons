@@ -10,7 +10,7 @@ Script can be operated in manual mode or using input file with specified paramet
 python phonons.py input.txt
 ```
 
-### input file compositon
+#### input file compositon
 An example file is available in this repository. Comment lines with \# signs must remain in place. The file layout is as follows:
 ```
 1. comment line
@@ -23,6 +23,6 @@ An example file is available in this repository. Comment lines with \# signs mus
 8. list of desired frequencies separated with space and rounded up to two decimals 
 ```
 
-### manual mode
+#### manual mode
 If no input file is specified user will be asked to enter the values manually. 
 To exit program user must press enter without entering any values. 
