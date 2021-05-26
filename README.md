@@ -3,11 +3,19 @@
 
 A script that reads POSCAR and OUTCAR files from VESTA package and produces VASP files with deformed structures for specific frequency and amplitude of vibration. 
 
+## installation
+Script can be launched from any directory if it is installed in such a way:
+1. Download phonons.py file
+2. Put it in a folder in your $PATH (such as ```usr/local/bin```)
+3. Change permissions by typing ```chmod +x phonons.py; mv phonons.py phonons```
+
+Other option is to have the script in your working directory and launching it using command ```python phonons.py```.
+
 ## basic usage
 
 Script can be operated in manual mode or using input file with specified parameters. The second option is recommended for generating structures for many frequencies in one run. This mode starts automatically if the run command is followed by an input file name. Example:
 ```
-python phonons.py input.txt
+phonons input.txt
 ```
 
 #### input file compositon
