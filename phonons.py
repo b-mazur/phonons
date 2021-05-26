@@ -70,7 +70,7 @@ if len(sys.argv) < 2:
     # frequency input
     while True:
         try:
-            freq_min, freq_max = (float(s) for s in input('Enter the frequency range you want to analyze '
+            freq_min, freq_max = (float(s) for s in input('Enter the frequency range (in cm-1) you want to analyze '
                                                           '(with space as separator, e.g., 22 27): ').split())
         except ValueError:
             print('Incorrect data format. Try again: ')
