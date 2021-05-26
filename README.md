@@ -1,7 +1,7 @@
 # phonons.py
 
 
-A script that reads POSCAR and OUTCAR files from VESTA package and produces VASP files with structures for specific frequency and amplitude of vibration. 
+A script that reads POSCAR and OUTCAR files from VESTA package and produces VASP files with deformed structures for specific frequency and amplitude of vibration. 
 
 ## basic usage
 
